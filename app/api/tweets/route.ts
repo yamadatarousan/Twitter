@@ -1,25 +1,15 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-
     if (!session?.user?.email) {
       return NextResponse.json(
         { message: "Unauthorized" },
         { status: 401 }
-      );
-    }
-
-    const { content } = await req.json();
-
-    if (!content) {
-      return NextResponse.json(
-        { message: "Content is required" },
-        { status: 400 }
       );
     }
 
@@ -36,6 +26,16 @@ export async function POST(req: Request) {
       );
     }
 
+    const body = await req.json();
+    const { content } = body;
+
+    if (!content) {
+      return NextResponse.json(
+        { message: "Content is required" },
+        { status: 400 }
+      );
+    }
+
     const tweet = await prisma.tweet.create({
       data: {
         content,
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json(tweet, { status: 201 });
+    return NextResponse.json(tweet);
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const tweets = await prisma.tweet.findMany({
       include: {
