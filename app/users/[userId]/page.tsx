@@ -10,6 +10,7 @@ export default async function UserProfilePage({
 }: {
   params: { userId: string };
 }) {
+  const userId = params.userId;
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     redirect("/login");
@@ -24,7 +25,7 @@ export default async function UserProfilePage({
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: params.userId },
+    where: { id: userId },
     include: {
       followers: true,
       following: true,
@@ -80,14 +81,14 @@ export default async function UserProfilePage({
 
       <div className="mb-4 flex items-center space-x-4">
         <Link
-          href={`/users/${user.id}/following`}
+          href={`/users/${userId}/following`}
           className="text-sm text-gray-500 hover:text-gray-700"
         >
           <span className="font-bold text-gray-900">{user.following.length}</span>{" "}
           フォロー中
         </Link>
         <Link
-          href={`/users/${user.id}/followers`}
+          href={`/users/${userId}/followers`}
           className="text-sm text-gray-500 hover:text-gray-700"
         >
           <span className="font-bold text-gray-900">{user.followers.length}</span>{" "}

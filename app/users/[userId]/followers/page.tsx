@@ -10,6 +10,7 @@ export default async function FollowersPage({
 }: {
   params: { userId: string };
 }) {
+  const userId = params.userId;
   const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
     redirect("/login");
@@ -24,7 +25,7 @@ export default async function FollowersPage({
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: params.userId },
+    where: { id: userId },
     include: {
       followers: {
         include: {
@@ -45,7 +46,7 @@ export default async function FollowersPage({
   return (
     <div className="mx-auto max-w-2xl px-4">
       <div className="mb-4 flex items-center space-x-4">
-        <Link href={`/users/${user.id}`} className="text-gray-500 hover:text-gray-700">
+        <Link href={`/users/${userId}`} className="text-gray-500 hover:text-gray-700">
           <svg
             className="h-6 w-6"
             fill="none"
